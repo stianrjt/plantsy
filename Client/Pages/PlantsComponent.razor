@@ -1,0 +1,74 @@
+﻿@page "/plants"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Plantsy.Shared
+@attribute [Authorize]
+@inject HttpClient Http
+
+
+<h3>Plants</h3>
+
+@if (plants == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Plant Name</th>
+				<th>Plant Type</th>
+				<th>Last Watered</th>
+				<th>Info</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var plant in plants)
+			{
+				<tr>
+					<td>@plant.PlantName</td>
+					<td>@plant.PlantType</td>
+					<td>@plant.WaterLog.OrderByDescending(x => x.WaterDate).FirstOrDefault()?.WaterDate.DateTime</td>
+					<td>@plant.Info</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>TEST</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var w in water)
+			{
+				<tr>
+					<td>@w.Note</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	private List<Plant> plants;
+	private List<Water> water;
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			plants = await Http.GetFromJsonAsync<List<Plant>>("plants");
+			water = plants.FirstOrDefault().WaterLog;
+		}
+		catch (AccessTokenNotAvailableException exception)
+		{
+			exception.Redirect();
+		}
+	}
+
+}
