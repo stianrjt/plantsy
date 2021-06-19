@@ -1,42 +1,9 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Plantsy</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="oi oi-cloudy" aria-hidden="true"></span> Weather
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="plants">
-                <span class="oi oi-heart" aria-hidden="true"></span> Plants
-            </NavLink>
-        </li>
-    </ul>
-</div>
+﻿
+<MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Outlined.Home" Href="">Home</MudNavLink>
+<MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Outlined.AddAlarm" Href="counter">Counter</MudNavLink>
+<MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Outlined.WbSunny" Href="weather">Weather</MudNavLink>
+<MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Outlined.EmojiNature" Href="plants">Plants</MudNavLink>
 
 @code {
-    private bool collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
 }

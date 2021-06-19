@@ -12,6 +12,7 @@ using Plantsy.Server.Data;
 using Plantsy.Server.Models;
 using System;
 using System.Linq;
+using MudBlazor.Services;
 
 namespace Plantsy.Server
 {
@@ -45,6 +46,8 @@ namespace Plantsy.Server
 
 			services.AddControllersWithViews();
 			services.AddRazorPages();
+
+			services.AddMudServices();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

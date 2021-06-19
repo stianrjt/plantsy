@@ -6,57 +6,45 @@
 @inject HttpClient Http
 
 
-<h3>Plants</h3>
+<h2>Plants</h2>
 
 @if (plants == null)
 {
-	<p><em>Loading...</em></p>
+	<MudTable Items="@plants" Hover="true" Breakpoint="Breakpoint.Sm" Loading=true LoadingProgressColor="Color.Info">
+		<HeaderContent>
+			<MudTh>Date</MudTh>
+			<MudTh>Temp. (C)</MudTh>
+			<MudTh>Temp. (F)</MudTh>
+			<MudTh>Summary</MudTh>
+		</HeaderContent>
+	</MudTable>
 }
 else
 {
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Plant Name</th>
-				<th>Plant Type</th>
-				<th>Last Watered</th>
-				<th>Info</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var plant in plants)
-			{
-				<tr>
-					<td>@plant.PlantName</td>
-					<td>@plant.PlantType</td>
-					<td>@plant.WaterLog.OrderByDescending(x => x.WaterDate).FirstOrDefault()?.WaterDate.DateTime</td>
-					<td>@plant.Info</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+	<MudTable Items="@plants" Hover="true" Breakpoint="Breakpoint.Sm" Loading=false LoadingProgressColor="Color.Info">
+		<HeaderContent>
+			<MudTh>Plant Name</MudTh>
+			<MudTh>Plant Type</MudTh>
+			<MudTh>Last Watered</MudTh>
+			<MudTh>Info</MudTh>
+		</HeaderContent>
+		<RowTemplate>
+			<MudTd DataLabel="Date">@context.PlantName</MudTd>
+			<MudTd DataLabel="temp-c">@context.PlantType</MudTd>
+			<MudTd DataLabel="temp-f">@context.WaterLog.OrderByDescending(x => x.WaterDate).FirstOrDefault()?.WaterDate.DateTime</MudTd>
+			<MudTd DataLabel="summary" HideSmall="_hidePosition">@context.Info</MudTd>
+		</RowTemplate>
+	</MudTable>
 
-
-	<table class="table">
-		<thead>
-			<tr>
-				<th>TEST</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var w in water)
-			{
-				<tr>
-					<td>@w.Note</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+	<MudSwitch @bind-Checked="_hidePosition">Hide <b>position</b> when Breakpoint=Xs</MudSwitch>
+	<MudSwitch @bind-Checked="_loading">Show Loading</MudSwitch>
 }
 
 @code {
 	private List<Plant> plants;
 	private List<Water> water;
+	private bool _hidePosition;
+	private bool _loading;
 
 	protected override async Task OnInitializedAsync()
 	{

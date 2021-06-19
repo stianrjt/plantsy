@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using MudBlazor.Services;
+
 
 namespace Plantsy.Client
 {
@@ -25,6 +27,7 @@ namespace Plantsy.Client
 			builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Plantsy.ServerAPI"));
 
 			builder.Services.AddApiAuthorization();
+			builder.Services.AddMudServices();
 
 			await builder.Build().RunAsync();
 		}
