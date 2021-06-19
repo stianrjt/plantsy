@@ -1,0 +1,103 @@
+﻿@page "/addPlant"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Plantsy.Shared
+@attribute [Authorize]
+@inject HttpClient Http
+
+<h2>New Plant</h2>
+
+
+@using System.ComponentModel.DataAnnotations
+
+@if (success)
+			{
+				<MudText>
+					@model.PlantName added to plants!
+				</MudText>
+			}
+
+<div style="max-width: 400px;">
+	<EditForm Model="@model" OnValidSubmit="AddPlant">
+		<DataAnnotationsValidator />
+		<MudCard>
+			<MudCardContent>
+				<MudTextField Label="Plant Name" 
+							  @bind-Value="model.PlantName" For="@(() => model.PlantName)" />
+				<MudTextField Label="Plant Type" Class="mt-3"
+							  @bind-Value="model.PlantType" For="@(() => model.PlantType)" />
+				<MudTextField Label="Info about plant"  Class="mt-3"
+							  @bind-Value="model.Info" For="@(() => model.Info)" />
+
+				@*<InputFile id="fileInput" OnChange="UploadFiles" hidden multiple />
+				<MudIconButton HtmlTag="label"
+							   Color="Color.Info"
+							   Icon="@Icons.Filled.PhotoCamera"
+							   for="fileInput">
+				</MudIconButton>*@
+			</MudCardContent>
+
+			<MudCardActions>
+				<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+			</MudCardActions>
+		</MudCard>
+	</EditForm>
+</div>
+@code
+{
+	IList<IBrowserFile> files = new List<IBrowserFile>();
+	private void UploadFiles(InputFileChangeEventArgs e)
+	{
+		foreach (var file in e.GetMultipleFiles())
+		{
+			files.Add(file);
+		}
+		//TODO upload the files to the server
+	}
+}
+
+@code {
+	NewPlantForm model = new NewPlantForm();
+	bool success;
+
+	public class NewPlantForm
+	{
+		[Required]
+		[StringLength(30, ErrorMessage = "Name length can't be more than 30.")]
+		public string PlantName { get; set; }
+
+		[Required]
+		[StringLength(30, ErrorMessage = "Type length can't be more than 30.")]
+		public string PlantType { get; set; }
+
+		[Required]
+		[StringLength(200, ErrorMessage = "Info can't be longer than 200 character.")]
+		public string Info { get; set; }
+
+		//[Required]
+		public Image Image { get; set; }
+
+	}
+
+
+	private async Task AddPlant()
+	{
+
+		var status = await Http.PostAsJsonAsync("plants", model);
+		if (status.IsSuccessStatusCode)
+		{
+			success = true;
+			StateHasChanged();
+			model.Info = null;
+			model.PlantName = null;
+			model.PlantType = null;
+			model.Image = null;
+
+		}
+		
+	}
+
+}
+
+

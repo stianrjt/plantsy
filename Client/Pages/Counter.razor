@@ -1,10 +1,12 @@
 ﻿@page "/counter"
 
-<h1>Counter</h1>
+<MudText Typo="Typo.h1">Counter</MudText>
 
-<p>Current count: @currentCount</p>
+<MudText Typo="Typo.h5">Current count: @currentCount</MudText>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<MudFab Color="Color.Primary" @onclick="IncrementCount" Icon="@Icons.Material.Filled.Add" />
+
 
 @code {
     private int currentCount = 0;

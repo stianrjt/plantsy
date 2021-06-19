@@ -1,4 +1,4 @@
-﻿@page "/plants"
+﻿@page "/allPlants"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Plantsy.Shared
@@ -10,7 +10,8 @@
 
 @if (plants == null)
 {
-	<MudTable Items="@plants" Hover="true" Breakpoint="Breakpoint.Sm" Loading=true LoadingProgressColor="Color.Info">
+	var emptyPlants = new List<Plant>();
+	<MudTable Items="@emptyPlants" Hover="true" Breakpoint="Breakpoint.Sm" Loading=true LoadingProgressColor="Color.Info">
 		<HeaderContent>
 			<MudTh>Date</MudTh>
 			<MudTh>Temp. (C)</MudTh>
@@ -18,45 +19,57 @@
 			<MudTh>Summary</MudTh>
 		</HeaderContent>
 	</MudTable>
+
 }
 else
 {
+	//TODO: Leggeg inn fargekoding baset på om planten må vannes. Dette kan settes som interval.
+
 	<MudTable Items="@plants" Hover="true" Breakpoint="Breakpoint.Sm" Loading=false LoadingProgressColor="Color.Info">
 		<HeaderContent>
 			<MudTh>Plant Name</MudTh>
 			<MudTh>Plant Type</MudTh>
 			<MudTh>Last Watered</MudTh>
 			<MudTh>Info</MudTh>
+			<MudTh>Water Plant Now</MudTh>
 		</HeaderContent>
 		<RowTemplate>
 			<MudTd DataLabel="Date">@context.PlantName</MudTd>
 			<MudTd DataLabel="temp-c">@context.PlantType</MudTd>
 			<MudTd DataLabel="temp-f">@context.WaterLog.OrderByDescending(x => x.WaterDate).FirstOrDefault()?.WaterDate.DateTime</MudTd>
 			<MudTd DataLabel="summary" HideSmall="_hidePosition">@context.Info</MudTd>
+			<MudTd DataLabel="wateredNow">
+					<MudButton Variant="Variant.Filled" Size="Size.Small"
+							OnClick="@(() => WaterPlant(context))">Water Plant</MudButton>
+				</MudTd>
 		</RowTemplate>
 	</MudTable>
 
-	<MudSwitch @bind-Checked="_hidePosition">Hide <b>position</b> when Breakpoint=Xs</MudSwitch>
-	<MudSwitch @bind-Checked="_loading">Show Loading</MudSwitch>
 }
 
 @code {
 	private List<Plant> plants;
-	private List<Water> water;
 	private bool _hidePosition;
-	private bool _loading;
 
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
 			plants = await Http.GetFromJsonAsync<List<Plant>>("plants");
-			water = plants.FirstOrDefault().WaterLog;
 		}
 		catch (AccessTokenNotAvailableException exception)
 		{
 			exception.Redirect();
 		}
+	}
+
+	public async void WaterPlant(Plant plant)
+	{
+		var waterLog = plant.WaterLog;
+		waterLog.Add(new Water { WaterDate = DateTimeOffset.Now, });
+		plant.WaterLog = waterLog;
+		await Http.PutAsJsonAsync($"plants/{plant.ID}", plant);
+		return;
 	}
 
 }

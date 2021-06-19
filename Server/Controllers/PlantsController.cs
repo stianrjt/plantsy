@@ -63,7 +63,10 @@ namespace Plantsy.Server.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(plant).State = EntityState.Modified;
+            var plantToUpdate = await _context.Plants.FirstOrDefaultAsync(x => x.ID == id);
+            plantToUpdate.WaterLog = plant.WaterLog;
+            _context.Entry(plantToUpdate).State = EntityState.Modified;
+            
 
             try
             {
