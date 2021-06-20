@@ -65,6 +65,11 @@ namespace Plantsy.Server.Controllers
 
             var plantToUpdate = await _context.Plants.FirstOrDefaultAsync(x => x.ID == id);
             plantToUpdate.WaterLog = plant.WaterLog;
+            plantToUpdate.LastWatered = plant.LastWatered;
+            plantToUpdate.PlantName = plant.PlantName;
+            plantToUpdate.PlantType = plant.PlantType;
+            plantToUpdate.Info = plant.Info;
+         
             _context.Entry(plantToUpdate).State = EntityState.Modified;
             
 

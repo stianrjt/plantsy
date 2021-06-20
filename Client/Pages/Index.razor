@@ -1,5 +1,74 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Plantsy.Shared
+@attribute [Authorize]
+@inject HttpClient Http
 
 
+
+
+@if (plants == null)
+{
+	<MudSkeleton />
+	<MudSkeleton SkeletonType="SkeletonType.Circle" Width="50px" Height="50px" />
+	<MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="200px" Height="110px" />
+}
+else
+{
+	<MudGrid>
+		<MudItem Style="background-color: transparent; border: hidden; elevation: unset" xs="12" md="12">
+			<MudPaper Style="background-color:transparent; border: hidden; elevation: unset" Class="d-flex flex-wrap flex-wrap py-2 px-1">
+				@foreach (var plant in plants)
+				{
+					var link = $"editPlant/{plant.ID.ToString()}";
+
+					<MudCard  Style="width:200px" Elevation="3" Class="ma-2">
+						<MudCardMedia  Image="Strelitzia-reginae-1.jpg" Style="border-radius:2%; width:200px" Height="200" />
+						<MudCardHeader>
+							<CardHeaderContent>
+								<MudText Typo="Typo.h6">@plant.PlantName</MudText>
+							</CardHeaderContent>
+							<CardHeaderActions>
+								<link href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" rel="stylesheet">
+								<MudIconButton Icon="fas fa-tint " Style="color: lightskyblue" />
+							</CardHeaderActions>
+						</MudCardHeader>
+						<MudCardContent>
+							<MudText Typo="Typo.body2">@plant.Info</MudText>
+						</MudCardContent>
+						<MudCardActions>
+							<MudLink Href="@link">
+								<MudButton Variant="Variant.Text" Color="Color.Secondary">Edit Plant</MudButton>
+							</MudLink>
+						</MudCardActions>
+					</MudCard>
+
+
+				}
+
+			</MudPaper>
+		</MudItem>
+	</MudGrid>
+}
+
+
+
+@code {
+	private List<Plant> plants;
+	private bool _hidePosition;
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			plants = await Http.GetFromJsonAsync<List<Plant>>("plants");
+		}
+		catch (AccessTokenNotAvailableException exception)
+		{
+			exception.Redirect();
+		}
+	}
+
+}

@@ -13,10 +13,11 @@
 	var emptyPlants = new List<Plant>();
 	<MudTable Items="@emptyPlants" Hover="true" Breakpoint="Breakpoint.Sm" Loading=true LoadingProgressColor="Color.Info">
 		<HeaderContent>
-			<MudTh>Date</MudTh>
-			<MudTh>Temp. (C)</MudTh>
-			<MudTh>Temp. (F)</MudTh>
-			<MudTh>Summary</MudTh>
+			<MudTh>Plant Name</MudTh>
+			<MudTh>Plant Type</MudTh>
+			<MudTh>Last Watered</MudTh>
+			<MudTh>Info</MudTh>
+			<MudTh>Water Plant Now</MudTh>
 		</HeaderContent>
 	</MudTable>
 
@@ -25,7 +26,7 @@ else
 {
 	//TODO: Leggeg inn fargekoding baset på om planten må vannes. Dette kan settes som interval.
 
-	<MudTable Items="@plants" Hover="true" Breakpoint="Breakpoint.Sm" Loading=false LoadingProgressColor="Color.Info">
+	<MudTable  Items="@plants" Hover="true" Breakpoint="Breakpoint.Sm" Loading=false LoadingProgressColor="Color.Info">
 		<HeaderContent>
 			<MudTh>Plant Name</MudTh>
 			<MudTh>Plant Type</MudTh>
@@ -34,14 +35,30 @@ else
 			<MudTh>Water Plant Now</MudTh>
 		</HeaderContent>
 		<RowTemplate>
-			<MudTd DataLabel="Date">@context.PlantName</MudTd>
-			<MudTd DataLabel="temp-c">@context.PlantType</MudTd>
-			<MudTd DataLabel="temp-f">@context.WaterLog.OrderByDescending(x => x.WaterDate).FirstOrDefault()?.WaterDate.DateTime</MudTd>
-			<MudTd DataLabel="summary" HideSmall="_hidePosition">@context.Info</MudTd>
+			<MudTd DataLabel="name">@context.PlantName</MudTd>
+			<MudTd DataLabel="type">@context.PlantType</MudTd>
+			<MudTd  DataLabel="wateredDate">@context.LastWatered.DateTime</MudTd>
+			<MudTd DataLabel="info" HideSmall="_hidePosition">@context.Info</MudTd>
 			<MudTd DataLabel="wateredNow">
-					<MudButton Variant="Variant.Filled" Size="Size.Small"
-							OnClick="@(() => WaterPlant(context))">Water Plant</MudButton>
-				</MudTd>
+				@if ((DateTimeOffset.Now - context.LastWatered).Days < 5)
+					{
+					<MudButton Color="Color.Success" Variant="Variant.Filled" Size="Size.Small"
+							   OnClick="@(() => WaterPlant(context))">Water Plant</MudButton>
+					}
+					else if ((DateTimeOffset.Now - context.LastWatered).Days < 7)
+					{
+
+					<MudButton Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small"
+							   OnClick="@(() => WaterPlant(context))">Water Plant</MudButton>
+
+					}
+					else
+					{
+					<MudButton Color="Color.Error" Variant="Variant.Filled" Size="Size.Small"
+							   OnClick="@(() => WaterPlant(context))">Water Plant</MudButton>
+					}
+
+			</MudTd>
 		</RowTemplate>
 	</MudTable>
 
@@ -63,11 +80,13 @@ else
 		}
 	}
 
+
 	public async void WaterPlant(Plant plant)
 	{
 		var waterLog = plant.WaterLog;
 		waterLog.Add(new Water { WaterDate = DateTimeOffset.Now, });
 		plant.WaterLog = waterLog;
+		plant.LastWatered = DateTimeOffset.Now;
 		await Http.PutAsJsonAsync($"plants/{plant.ID}", plant);
 		return;
 	}

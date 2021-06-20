@@ -1,0 +1,112 @@
+﻿@page "/editPlant/{ID}"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Plantsy.Shared
+@attribute [Authorize]
+@inject HttpClient Http
+@using System.ComponentModel.DataAnnotations
+
+@if (success)
+{
+	<MudText>
+		@model.PlantName updated!
+	</MudText>
+}
+
+@if (plant == null || model == null)
+{
+	<MudSkeleton />
+	<MudSkeleton SkeletonType="SkeletonType.Circle" Width="50px" Height="50px" />
+	<MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="200px" Height="110px" />
+}
+else
+{
+	<h3>Edit Plant @plant.PlantName</h3>
+	<div style="max-width: 400px;">
+		<EditForm Model="@model" OnValidSubmit="@UpdatePlant">
+			<DataAnnotationsValidator />
+			<MudCard>
+				<MudCardContent>
+					<MudTextField Label="Plant Name"
+								  @bind-Value="model.PlantName" For="@(() => model.PlantName)" />
+					<MudTextField Label="Plant Type" Class="mt-3"
+								  @bind-Value="model.PlantType" For="@(() => model.PlantType)" />
+					<MudTextField Label="Info about plant" Class="mt-3"
+								  @bind-Value="model.Info" For="@(() => model.Info)" />
+
+				</MudCardContent>
+
+				<MudCardActions>
+					<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+				</MudCardActions>
+			</MudCard>
+		</EditForm>
+	</div>
+}
+
+
+
+
+@code
+{
+	[Parameter]
+	public string ID { get; set; }
+
+	Plant plant;
+
+	EditPlantForm model = new EditPlantForm();
+
+
+	bool success;
+
+	public record EditPlantForm
+	{
+
+		public string ID { get; set; }
+
+		[StringLength(30, ErrorMessage = "Name length can't be more than 30.")]
+		public string PlantName { get; set; }
+
+
+		[StringLength(30, ErrorMessage = "Type length can't be more than 30.")]
+		public string PlantType { get; set; }
+
+
+		[StringLength(200, ErrorMessage = "Info can't be longer than 200 character.")]
+		public string Info { get; set; }
+	}
+
+
+	protected override async Task OnInitializedAsync()
+	{
+
+		try
+		{
+			plant = await Http.GetFromJsonAsync<Plant>($"plants/{ID}");
+		}
+		catch (AccessTokenNotAvailableException exception)
+		{
+			exception.Redirect();
+		}
+
+		model.PlantName = plant.PlantName;
+		model.PlantType = plant.PlantType;
+		model.Info = plant.Info;
+		model.ID = plant.ID.ToString();
+	}
+
+	private async Task UpdatePlant()
+	{
+
+		var status = await Http.PutAsJsonAsync($"plants/{ID}", model);
+		if (status.IsSuccessStatusCode)
+		{
+			success = true;
+			StateHasChanged();
+		}
+
+	}
+}
+
+

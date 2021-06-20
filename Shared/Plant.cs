@@ -11,6 +11,7 @@ namespace Plantsy.Shared
 		public string PlantName { get; set; }
 		public string PlantType { get; set; }
 		public List<Image> Images { get; set; }
+		public DateTimeOffset LastWatered { get; set; }
 		public List<Water> WaterLog { get; set; }
 		public string Info { get; set; }
 		public List<Change> ChangeLog { get; set; }
