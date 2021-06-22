@@ -5,12 +5,21 @@
 @using Plantsy.Shared
 @attribute [Authorize]
 @inject HttpClient Http
+@inject NavigationManager NavManager
+@inject IDialogService DialogService
 @using System.ComponentModel.DataAnnotations
 
-@if (success)
+@if (updated)
 {
 	<MudText>
 		@model.PlantName updated!
+	</MudText>
+}
+
+@if (deleted)
+{
+	<MudText>
+		@model.PlantName deleted!
 	</MudText>
 }
 
@@ -23,7 +32,7 @@
 else
 {
 	<h3>Edit Plant @plant.PlantName</h3>
-	<div style="max-width: 400px;">
+	<div style="max-width: 600px;">
 		<EditForm Model="@model" OnValidSubmit="@UpdatePlant">
 			<DataAnnotationsValidator />
 			<MudCard>
@@ -40,9 +49,14 @@ else
 				<MudCardActions>
 					<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
 				</MudCardActions>
+				<MudCardActions>
+					<MudButton @onclick="OpenDialog" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" Class="mr-auto">Delete Plant</MudButton>
+				</MudCardActions>
 			</MudCard>
 		</EditForm>
 	</div>
+
+
 }
 
 
@@ -58,7 +72,8 @@ else
 	EditPlantForm model = new EditPlantForm();
 
 
-	bool success;
+	bool updated;
+	bool deleted;
 
 	public record EditPlantForm
 	{
@@ -98,15 +113,25 @@ else
 
 	private async Task UpdatePlant()
 	{
-
-		var status = await Http.PutAsJsonAsync($"plants/{ID}", model);
+		plant.PlantName = model.PlantName;
+		plant.PlantType = model.PlantType;
+		plant.Info = model.Info;
+		var status = await Http.PutAsJsonAsync($"plants/{ID}", plant);
 		if (status.IsSuccessStatusCode)
 		{
-			success = true;
+			updated = true;
 			StateHasChanged();
 		}
 
 	}
+
+	private void OpenDialog()
+	{
+		var parameters = new DialogParameters();
+		parameters.Add("plant", plant);
+		DialogService.Show<Delete_Dialog>("Delete this plant?", parameters);
+	}
+
 }
 
 

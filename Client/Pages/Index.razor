@@ -32,7 +32,23 @@ else
 							</CardHeaderContent>
 							<CardHeaderActions>
 								<link href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" rel="stylesheet">
-								<MudIconButton Icon="fas fa-tint " Style="color: lightskyblue" />
+								@if ((DateTimeOffset.Now - plant.LastWatered).Days < 5)
+								{
+									<MudIconButton Icon="fas fa-tint " Style="Color: green"  Size="Size.Small"
+												   OnClick="@(() => WaterPlant(plant))" />
+								}
+								else if ((DateTimeOffset.Now - plant.LastWatered).Days < 7)
+								{
+
+									<MudIconButton Icon="fas fa-tint " Style="Color: yellow"  Size="Size.Small"
+												   OnClick="@(() => WaterPlant(plant))" />
+
+								}
+								else
+								{
+									<MudIconButton Icon="fas fa-tint " Style="Color: red"  Size="Size.Small"
+												   OnClick="@(() => WaterPlant(plant))" />
+								}
 							</CardHeaderActions>
 						</MudCardHeader>
 						<MudCardContent>
@@ -40,7 +56,7 @@ else
 						</MudCardContent>
 						<MudCardActions>
 							<MudLink Href="@link">
-								<MudButton Variant="Variant.Text" Color="Color.Secondary">Edit Plant</MudButton>
+								<MudButton Variant="Variant.Text" Color="Color.Secondary" Style="bottom: 10px; margin: 5px">Edit Plant</MudButton>
 							</MudLink>
 						</MudCardActions>
 					</MudCard>
@@ -69,6 +85,16 @@ else
 		{
 			exception.Redirect();
 		}
+	}
+
+	public async void WaterPlant(Plant plant)
+	{
+		var waterLog = plant.WaterLog;
+		waterLog.Add(new Water { WaterDate = DateTimeOffset.Now, });
+		plant.WaterLog = waterLog;
+		plant.LastWatered = DateTimeOffset.Now;
+		await Http.PutAsJsonAsync($"plants/{plant.ID}", plant);
+		return;
 	}
 
 }

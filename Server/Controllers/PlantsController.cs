@@ -67,6 +67,8 @@ namespace Plantsy.Server.Controllers
             plantToUpdate.PlantName = plant.PlantName;
             plantToUpdate.PlantType = plant.PlantType;
             plantToUpdate.Info = plant.Info;
+            plantToUpdate.LastWatered = plant.LastWatered;
+            plantToUpdate.WaterLog = plant.WaterLog;
          
             _context.Entry(plantToUpdate).State = EntityState.Modified;
             
