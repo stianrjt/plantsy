@@ -19,8 +19,8 @@
 
 		LayoutProperties = new LayoutProperties()
 		{
-			DrawerWidthLeft = "260px",
-			DrawerWidthRight = "300px",
+			DrawerWidthLeft = "180px",
+			DrawerWidthRight = "200px",
 			
 		}
 	};
@@ -42,7 +42,8 @@
 	</MudAppBar>
 	<MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
 		<MudDrawerHeader >
-			<MudText Color="Color.Primary" Typo="Typo.h5" Class="mt-1">Plantsy</MudText>
+			<MudText Typo="Typo.h5" Style="color: #33691E" Class="mt-1"><strong>Plantsy</strong></MudText>
+			<MudIcon Icon="fas fa-leaf" Style="color: #33691E"/>
 		</MudDrawerHeader>
 		<NavMenu />
 	</MudDrawer>

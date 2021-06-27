@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Plantsy.Shared
+@using System.IO
 @attribute [Authorize]
 @inject HttpClient Http
 
@@ -12,50 +13,68 @@
 @using System.ComponentModel.DataAnnotations
 
 @if (success)
-			{
-				<MudText>
-					@model.PlantName added to plants!
-				</MudText>
-			}
+{
+	<MudText>
+		@model.PlantName added to plants!
+	</MudText>
+}
 
 <div style="max-width: 400px;">
 	<EditForm Model="@model" OnValidSubmit="AddPlant">
 		<DataAnnotationsValidator />
 		<MudCard>
 			<MudCardContent>
-				<MudTextField Label="Plant Name" 
+				<MudTextField Label="Plant Name"
 							  @bind-Value="model.PlantName" For="@(() => model.PlantName)" />
 				<MudTextField Label="Plant Type" Class="mt-3"
 							  @bind-Value="model.PlantType" For="@(() => model.PlantType)" />
-				<MudTextField Label="Info about plant"  Class="mt-3"
+				<MudTextField Label="Info about plant" Class="mt-3"
 							  @bind-Value="model.Info" For="@(() => model.Info)" />
 
-				@*<InputFile id="fileInput" OnChange="UploadFiles" hidden multiple />
+				
+			</MudCardContent>
+
+			<MudCardActions>
+				<InputFile id="fileInput" OnChange="UploadImage" hidden single />
 				<MudIconButton HtmlTag="label"
 							   Color="Color.Info"
 							   Icon="@Icons.Filled.PhotoCamera"
 							   for="fileInput">
-				</MudIconButton>*@
-			</MudCardContent>
-
-			<MudCardActions>
+				</MudIconButton>
 				<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
 			</MudCardActions>
 		</MudCard>
 	</EditForm>
 </div>
+
+
+
+
+@if (uploaded)
+{
+
+	<img src="@imageSrc" alt="DAS IMAGE" />
+
+}
+
 @code
 {
 	IList<IBrowserFile> files = new List<IBrowserFile>();
-	private void UploadFiles(InputFileChangeEventArgs e)
+	string imageSrc = "";
+	bool uploaded = false;
+	private async Task UploadImage(InputFileChangeEventArgs e)
 	{
-		foreach (var file in e.GetMultipleFiles())
-		{
-			files.Add(file);
-		}
-		//TODO upload the files to the server
+		MemoryStream ms = new MemoryStream();
+		await e.File.OpenReadStream().CopyToAsync(ms);
+		var bytes = ms.ToArray();
+
+		var base64 = Convert.ToBase64String(bytes);
+		imageSrc = String.Format("data:image/gif;base64,{0}", base64);
+		uploaded = true;
 	}
 }
+
+
 
 @code {
 	NewPlantForm model = new NewPlantForm();
@@ -83,7 +102,12 @@
 
 	private async Task AddPlant()
 	{
+		model.Image = new Image
+		{
+			ImageName = model.PlantName + "Image",
+			ImagePath = imageSrc,
 
+		};
 		var status = await Http.PostAsJsonAsync("plants", model);
 		if (status.IsSuccessStatusCode)
 		{
@@ -93,11 +117,14 @@
 			model.PlantName = null;
 			model.PlantType = null;
 			model.Image = null;
+			imageSrc = "";
+			uploaded = false;
 
 		}
-		
+
 	}
 
 }
+
 
 

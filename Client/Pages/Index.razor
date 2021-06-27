@@ -5,6 +5,7 @@
 @using Plantsy.Shared
 @attribute [Authorize]
 @inject HttpClient Http
+@inject NavigationManager NavManager
 
 
 
@@ -22,10 +23,15 @@ else
 			<MudPaper Style="background-color:transparent; border: hidden; elevation: unset" Class="d-flex flex-wrap py-2 px-1">
 				@foreach (var plant in plants)
 				{
+					var linkDetails = $"plantDetails/{plant.ID.ToString()}";
 					var link = $"editPlant/{plant.ID.ToString()}";
 
-					<MudCard  Style="width:200px" Elevation="3" Class="flex-wrap ma-2">
-						<MudCardMedia  Image="Strelitzia-reginae-1.jpg" Style="border-radius:2%; width:200px" Height="250" />
+					var src = plant.Image != null ? plant.Image.ImagePath : "Strelitzia-reginae-1.jpg";
+
+					<MudCard Style="width:200px" Elevation="3" Class="flex-wrap ma-2">
+						<a href="@linkDetails">
+							<MudCardMedia Image=@src Style="border-radius:2%; width:200px" Height="250" />
+						</a>
 						<MudCardHeader>
 							<CardHeaderContent>
 								<MudText Typo="Typo.h6">@plant.PlantName</MudText>
@@ -34,19 +40,19 @@ else
 								<link href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" rel="stylesheet">
 								@if ((DateTimeOffset.Now - plant.LastWatered).Days < 5)
 								{
-									<MudIconButton Class="mr-1" Icon="fas fa-tint " Style="Color: forestgreen"  Size="Size.Small"
+									<MudIconButton Class="mr-1" Icon="fas fa-tint" Style="Color: forestgreen" Size="Size.Small"
 												   OnClick="@(() => WaterPlant(plant))" />
 								}
 								else if ((DateTimeOffset.Now - plant.LastWatered).Days < 7)
 								{
 
-									<MudIconButton Class="mr-1"  Icon="fas fa-tint " Style="Color: yellow"  Size="Size.Small"
+									<MudIconButton Class="mr-1" Icon="fas fa-tint " Style="Color: orange" Size="Size.Small"
 												   OnClick="@(() => WaterPlant(plant))" />
 
 								}
 								else
 								{
-									<MudIconButton Class="mr-1"  Icon="fas fa-tint " Style="Color: red"  Size="Size.Small"
+									<MudIconButton Class="mr-1" Icon="fas fa-tint " Style="Color: red" Size="Size.Small"
 												   OnClick="@(() => WaterPlant(plant))" />
 								}
 							</CardHeaderActions>
@@ -70,7 +76,6 @@ else
 
 @code {
 	private List<Plant> plants;
-	private bool _hidePosition;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -83,6 +88,7 @@ else
 			exception.Redirect();
 		}
 	}
+
 
 	public async void WaterPlant(Plant plant)
 	{

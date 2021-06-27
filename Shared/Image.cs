@@ -9,6 +9,8 @@ namespace Plantsy.Shared
 	{
 		public Guid ID { get; set; }
 		public Guid PlantID { get; set; }
+
+		//is rlly imgSource base64
 		public string ImagePath { get; set; }
 		public string ImageName { get; set; }
 	}

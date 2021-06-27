@@ -10,7 +10,8 @@ namespace Plantsy.Shared
 		public Guid ID { get; set; }
 		public string PlantName { get; set; }
 		public string PlantType { get; set; }
-		public List<Image> Images { get; set; }
+		public Image Image { get; set; }
+		public Guid ImageID { get; set; }
 		public DateTimeOffset LastWatered { get; set; }
 		public List<Water> WaterLog { get; set; }
 		public string Info { get; set; }
