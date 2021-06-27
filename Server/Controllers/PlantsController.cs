@@ -30,7 +30,7 @@ namespace Plantsy.Server.Controllers
         {
             var result = await _context.Plants
                 .Include(x => x.ChangeLog)
-                .Include(y => y.Images)
+                .Include(y => y.Image)
                 .Include(z => z.WaterLog)
                 .ToListAsync();
             return Ok(result);
@@ -42,7 +42,7 @@ namespace Plantsy.Server.Controllers
         {
             var plant = await _context.Plants
                 .Include(x => x.ChangeLog)
-                .Include(x => x.Images)
+                .Include(x => x.Image)
                 .Include(x => x.WaterLog).FirstOrDefaultAsync(x => x.ID == id);
 
             if (plant == null)
@@ -69,6 +69,7 @@ namespace Plantsy.Server.Controllers
             plantToUpdate.Info = plant.Info;
             plantToUpdate.LastWatered = plant.LastWatered;
             plantToUpdate.WaterLog = plant.WaterLog;
+            plantToUpdate.Image = plant.Image;
          
             _context.Entry(plantToUpdate).State = EntityState.Modified;
             
@@ -123,5 +124,6 @@ namespace Plantsy.Server.Controllers
         {
             return _context.Plants.Any(e => e.ID == id);
         }
+
     }
 }
