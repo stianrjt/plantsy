@@ -27,6 +27,7 @@ namespace Plantsy.Client
 			builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Plantsy.ServerAPI"));
 
 			builder.Services.AddApiAuthorization();
+
 			builder.Services.AddMudServices();
 
 			await builder.Build().RunAsync();
